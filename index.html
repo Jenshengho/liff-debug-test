@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>Debug LIFF 參數</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; padding: 2em; }
+    pre { background: #f0f0f0; padding: 1em; }
+  </style>
+</head>
+<body>
+  <h2>🔍 LIFF 傳入參數偵錯</h2>
+  <p>目前網址是：</p>
+  <pre id="url"></pre>
+  <p>參數：</p>
+  <pre id="params"></pre>
+
+  <script>
+    document.getElementById("url").innerText = window.location.href;
+    const search = window.location.search;
+    const hash = window.location.hash;
+    let output = "search: " + search + "\\n";
+    output += "hash: " + hash + "\\n";
+    const allParams = new URLSearchParams(search || hash.replace('#', '?'));
+    for (const [key, val] of allParams.entries()) {
+      output += key + ': ' + val + '\\n';
+    }
+    document.getElementById("params").innerText = output;
+  </script>
+</body>
+</html>
