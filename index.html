@@ -2,31 +2,45 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>Debug LIFF 參數</title>
+  <title>預約跳轉中...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: sans-serif; padding: 2em; }
-    pre { background: #f0f0f0; padding: 1em; }
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <h2>🔍 LIFF 傳入參數偵錯</h2>
-  <p>目前網址是：</p>
-  <pre id="url"></pre>
-  <p>參數：</p>
-  <pre id="params"></pre>
+  <h2>正在跳轉到預約頁面...</h2>
+  <p>請稍候</p>
 
   <script>
-    document.getElementById("url").innerText = window.location.href;
-    const search = window.location.search;
-    const hash = window.location.hash;
-    let output = "search: " + search + "\\n";
-    output += "hash: " + hash + "\\n";
-    const allParams = new URLSearchParams(search || hash.replace('#', '?'));
-    for (const [key, val] of allParams.entries()) {
-      output += key + ': ' + val + '\\n';
+    try {
+      const rawParams = new URLSearchParams(window.location.search);
+      let target = rawParams.get("target");
+
+      // LINE LIFF 特別情況：參數會變成 liff.state=%3Ftarget%3D...
+      if (!target && rawParams.get("liff.state")) {
+        const state = rawParams.get("liff.state"); // 例如 %3Ftarget%3Dhttps%253A%252F%252F...
+        const decoded = decodeURIComponent(state); // ?target=https%3A%2F%2F...
+        const subParams = new URLSearchParams(decoded);
+        target = subParams.get("target");
+      }
+
+      if (target && target.startsWith("http")) {
+        window.location.replace(target);
+      } else {
+        document.body.innerHTML = "<h2>⚠️ 無效的網址參數</h2><p>未偵測到正確的 target，請確認 LIFF 傳參方式。</p>";
+      }
+    } catch (e) {
+      document.body.innerHTML = "<h2>⚠️ 發生錯誤</h2><p>" + e.message + "</p>";
     }
-    document.getElementById("params").innerText = output;
   </script>
 </body>
 </html>
